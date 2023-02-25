@@ -22,7 +22,7 @@ func main() {
 	flag.StringVar(&apiAddr, "api", "http://localhost:5000", "api address")
 	flag.Parse()
 
-	apiC := newAPIClient(apiAddr)
+	apiC := NewAPIClient(apiAddr)
 
 	ser, err := serial.OpenPort(&serial.Config{
 		Name:        port,
