@@ -22,6 +22,8 @@ func main() {
 	flag.StringVar(&apiAddr, "api", "http://localhost:5000", "api address")
 	flag.Parse()
 
+	apiC := newAPIClient(apiAddr)
+
 	ser, err := serial.OpenPort(&serial.Config{
 		Name:        port,
 		Baud:        9600,
@@ -61,7 +63,7 @@ func main() {
 				currMode = (currMode + 1) % len(modes)
 				log.Printf("mode: %d", currMode)
 			} else {
-				if err := handle(button); err != nil {
+				if err := apiC.Handle(button); err != nil {
 					log.Printf("error doing %s: %v", button, err)
 				}
 			}
