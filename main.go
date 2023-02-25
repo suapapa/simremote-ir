@@ -13,11 +13,13 @@ import (
 var (
 	port       string
 	skipRepeat bool
+	apiAddr    string
 )
 
 func main() {
 	flag.StringVar(&port, "port", "/dev/ttyUSB0", "serial port")
 	flag.BoolVar(&skipRepeat, "skip-repeat", false, "skip repeated codes")
+	flag.StringVar(&apiAddr, "api", "http://localhost:5000", "api address")
 	flag.Parse()
 
 	ser, err := serial.OpenPort(&serial.Config{
@@ -58,6 +60,10 @@ func main() {
 			if button == MODE {
 				currMode = (currMode + 1) % len(modes)
 				log.Printf("mode: %d", currMode)
+			} else {
+				if err := handle(button); err != nil {
+					log.Printf("error doing %s: %v", button, err)
+				}
 			}
 		}
 
