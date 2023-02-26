@@ -4,17 +4,40 @@ import (
 	"bufio"
 	"encoding/hex"
 	"flag"
+	"fmt"
 	"log"
 	"time"
 
+	"github.com/suapapa/go_devices/tm1638"
 	"github.com/tarm/serial"
+	"periph.io/x/conn/v3/gpio/gpioreg"
+	"periph.io/x/host/v3"
 )
 
 var (
 	port            string
 	enableLongPress bool
 	apiAddr         string
+
+	fnd *tm1638.Module
 )
+
+func init() {
+	_, err := host.Init()
+	if err != nil {
+		panic(err)
+	}
+
+	fnd, err := tm1638.Open(
+		gpioreg.ByName("17"), // data
+		gpioreg.ByName("27"), // clk
+		gpioreg.ByName("22"), // stb
+	)
+	if err != nil {
+		panic(err)
+	}
+	displayWelcome(fnd)
+}
 
 func main() {
 	flag.StringVar(&port, "port", "/dev/ttyUSB0", "serial port")
@@ -34,6 +57,7 @@ func main() {
 	}
 	defer ser.Close()
 
+	fnd.SetString(fmt.Sprintf("M%d", curMode))
 	var code, lastCode uint32
 	for {
 		scanner := bufio.NewScanner(ser)
@@ -60,12 +84,14 @@ func main() {
 			log.Printf("code: 0x%x", code)
 			lastCode = code
 
-			button := modes[currMode][code]
+			button := modes[curMode][code]
 			log.Printf("button: %s", button)
+			fnd.SetString(fmt.Sprintf("M%d-%s", curMode, button))
 
 			if button == MODE {
-				currMode = (currMode + 1) % len(modes)
-				log.Printf("mode: %d", currMode)
+				curMode = (curMode + 1) % len(modes)
+				log.Printf("mode: %d", curMode)
+				fnd.SetString(fmt.Sprintf("M%d", curMode))
 			} else {
 				if err := apiC.Handle(button); err != nil {
 					log.Printf("error doing %s: %v", button, err)

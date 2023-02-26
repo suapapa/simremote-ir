@@ -30,5 +30,5 @@ var (
 		modeOTT,
 		modeTV,
 	}
-	currMode = 0
+	curMode = 0
 )
