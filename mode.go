@@ -23,7 +23,7 @@ var (
 		0xA659E786: VOLUP,
 		0xBD42E786: OK,
 		0xE916E786: BACK,
-		0xF00FE786: CHLIST,
+		0xF00FE786: INFO,
 	}
 
 	modes = []map[uint32]button{

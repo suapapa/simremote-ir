@@ -18,15 +18,17 @@ type TV struct {
 
 func NewTV() *TV {
 	return &TV{
+		// TODO: get list from TV
 		AudioOuts: []string{
 			"tv_speaker",
 			"external_optical",
 		},
 		Apps: []string{
+			"현재 방송",
 			"HDMI1",
 			"HDMI2",
-			"HDMI3",
-			"HDMI4",
+			// "HDMI3",
+			// "HDMI4",
 		},
 	}
 }

@@ -60,7 +60,7 @@ func (c *apiClient) get(path string) (map[string]any, error) {
 
 func (c *apiClient) Handle(btn button) error {
 	switch btn {
-	case UP, DOWN, LEFT, RIGHT, OK, BACK, HOME, CHUP, CHDOWN, VOLDOWN, VOLUP, CHLIST:
+	case UP, DOWN, LEFT, RIGHT, OK, BACK, HOME, CHUP, CHDOWN, VOLDOWN, VOLUP, INFO:
 		return c.keyHandler(btn)
 	case PWR:
 		if c.tv.Status != tvStatusOn {
@@ -101,7 +101,7 @@ func (c *apiClient) keyHandler(btn button) error {
 		CHDOWN:  "channel_down",
 		VOLDOWN: "volume_down",
 		VOLUP:   "volume_up",
-		CHLIST:  "dash",
+		INFO:    "info",
 	}
 
 	key, ok := btn2Key[btn]

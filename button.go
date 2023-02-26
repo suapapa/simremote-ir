@@ -18,7 +18,7 @@ const (
 	CHDOWN
 	VOLDOWN
 	VOLUP
-	CHLIST
+	INFO
 )
 
 func (b button) String() string {
@@ -53,8 +53,8 @@ func (b button) String() string {
 		return "VOLDOWN"
 	case VOLUP:
 		return "VOLUP"
-	case CHLIST:
-		return "CHLIST"
+	case INFO:
+		return "INFO"
 	default:
 		return "UNKNOWN"
 	}
