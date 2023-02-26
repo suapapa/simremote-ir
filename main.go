@@ -50,6 +50,10 @@ func main() {
 					log.Printf("error decoding %q: %v", codeStr, err)
 					continue
 				}
+				if len(codeBytes) != 4 {
+					log.Printf("unexpected code length: %d", len(codeBytes))
+					continue
+				}
 				code = uint32(codeBytes[0])<<24 | uint32(codeBytes[1])<<16 | uint32(codeBytes[2])<<8 | uint32(codeBytes[3])
 			}
 
