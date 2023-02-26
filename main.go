@@ -11,14 +11,14 @@ import (
 )
 
 var (
-	port       string
-	skipRepeat bool
-	apiAddr    string
+	port            string
+	enableLongPress bool
+	apiAddr         string
 )
 
 func main() {
 	flag.StringVar(&port, "port", "/dev/ttyUSB0", "serial port")
-	flag.BoolVar(&skipRepeat, "skip-repeat", false, "skip repeated codes")
+	flag.BoolVar(&enableLongPress, "l", false, "enable long press")
 	flag.StringVar(&apiAddr, "api", "http://localhost:5000", "api address")
 	flag.Parse()
 
@@ -40,7 +40,7 @@ func main() {
 		for scanner.Scan() {
 			codeStr := scanner.Text()
 			if codeStr == "0" {
-				if skipRepeat {
+				if !enableLongPress {
 					continue
 				}
 				code = lastCode
