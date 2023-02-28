@@ -18,11 +18,14 @@ var (
 	port            string
 	enableLongPress bool
 	apiAddr         string
-
-	fnd *tm1638.Module
 )
 
-func init() {
+func main() {
+	flag.StringVar(&port, "port", "/dev/ttyUSB0", "serial port")
+	flag.BoolVar(&enableLongPress, "l", false, "enable long press")
+	flag.StringVar(&apiAddr, "api", "http://localhost:5000", "api address")
+	flag.Parse()
+
 	_, err := host.Init()
 	if err != nil {
 		panic(err)
@@ -37,13 +40,6 @@ func init() {
 		panic(err)
 	}
 	displayWelcome(fnd)
-}
-
-func main() {
-	flag.StringVar(&port, "port", "/dev/ttyUSB0", "serial port")
-	flag.BoolVar(&enableLongPress, "l", false, "enable long press")
-	flag.StringVar(&apiAddr, "api", "http://localhost:5000", "api address")
-	flag.Parse()
 
 	apiC := NewAPIClient(apiAddr)
 
@@ -57,9 +53,10 @@ func main() {
 	}
 	defer ser.Close()
 
-	fnd.SetString(fmt.Sprintf("M%d", curMode))
 	var code, lastCode uint32
 	for {
+		fnd.SetString("        ")
+		fnd.SetString(fmt.Sprintf("M%d", curMode))
 		scanner := bufio.NewScanner(ser)
 		for scanner.Scan() {
 			codeStr := scanner.Text()
@@ -86,11 +83,13 @@ func main() {
 
 			button := modes[curMode][code]
 			log.Printf("button: %s", button)
+			fnd.SetString("        ")
 			fnd.SetString(fmt.Sprintf("M%d-%s", curMode, button))
 
 			if button == MODE {
 				curMode = (curMode + 1) % len(modes)
 				log.Printf("mode: %d", curMode)
+				fnd.SetString("        ")
 				fnd.SetString(fmt.Sprintf("M%d", curMode))
 			} else {
 				if err := apiC.Handle(button); err != nil {

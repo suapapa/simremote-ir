@@ -10,18 +10,11 @@ import (
 	"github.com/suapapa/go_devices/tm1638"
 )
 
-var (
-	rnd *rand.Rand
-)
-
-func init() {
-	rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
-}
-
 func displayWelcome(dev *tm1638.Module) error {
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 loop:
 	for i := 0; i < 100; i++ {
-		dev.SetString(randString())
+		dev.SetString(randString(rnd))
 		time.Sleep(30 * time.Millisecond)
 	}
 	_, ip, _, err := resolveNet()
@@ -32,7 +25,7 @@ loop:
 	return nil
 }
 
-func randString() string {
+func randString(rnd *rand.Rand) string {
 	// gen 32~126
 	var randString []byte
 	for i := 0; i < 8; i++ {
