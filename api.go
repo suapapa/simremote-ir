@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -9,12 +11,16 @@ import (
 type apiClient struct {
 	baseAddr string
 	tv       *TV
+	client   *http.Client
 }
 
 func NewAPIClient(baseAddr string) *apiClient {
 	return &apiClient{
 		baseAddr: baseAddr,
 		tv:       NewTV(),
+		client: &http.Client{
+			Timeout: 1 * time.Second,
+		},
 	}
 }
 
@@ -23,7 +29,7 @@ func (c *apiClient) put(path string) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to create request")
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return errors.Wrap(err, "failed to send request")
 	}
@@ -71,6 +77,11 @@ func (c *apiClient) Handle(btn button) error {
 		} else {
 			// if current status is on or unknown
 			if err := c.put("/tv/off"); err != nil {
+				if os.IsTimeout(err) {
+					// if timeout, assume TV is already off
+					c.tv.Status = tvStatusOff
+					return nil
+				}
 				return errors.Wrap(err, "failed to turn off TV")
 			}
 			c.tv.Status = tvStatusOff

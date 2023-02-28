@@ -81,7 +81,12 @@ func main() {
 			log.Printf("code: 0x%x", code)
 			lastCode = code
 
-			button := modes[curMode][code]
+			button, ok := modes[curMode][code]
+			if !ok {
+				log.Printf("unknown code: 0x%x", code)
+				continue
+			}
+
 			log.Printf("button: %s", button)
 			fnd.SetString("        ")
 			fnd.SetString(fmt.Sprintf("M%d-%s", curMode, button))
