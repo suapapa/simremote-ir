@@ -8,9 +8,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/suapapa/go_devices/tm1638"
 	"github.com/tarm/serial"
-	"periph.io/x/conn/v3/gpio/gpioreg"
 	"periph.io/x/host/v3"
 )
 
@@ -31,15 +29,8 @@ func main() {
 		panic(err)
 	}
 
-	fnd, err := tm1638.Open(
-		gpioreg.ByName("17"), // data
-		gpioreg.ByName("27"), // clk
-		gpioreg.ByName("22"), // stb
-	)
-	if err != nil {
-		panic(err)
-	}
-	displayWelcome(fnd)
+	fnd := NewFND()
+	fnd.Welcome()
 
 	apiC := NewAPIClient(apiAddr)
 
@@ -55,7 +46,6 @@ func main() {
 
 	var code, lastCode uint32
 	for {
-		fnd.SetString("        ")
 		fnd.SetString(fmt.Sprintf("M%d", curMode))
 		scanner := bufio.NewScanner(ser)
 		for scanner.Scan() {
@@ -88,13 +78,11 @@ func main() {
 			}
 
 			log.Printf("button: %s", button)
-			fnd.SetString("        ")
 			fnd.SetString(fmt.Sprintf("M%d-%s", curMode, button))
 
 			if button == MODE {
 				curMode = (curMode + 1) % len(modes)
 				log.Printf("mode: %d", curMode)
-				fnd.SetString("        ")
 				fnd.SetString(fmt.Sprintf("M%d", curMode))
 			} else {
 				if err := apiC.Handle(button); err != nil {

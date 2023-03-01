@@ -1,8 +1,8 @@
 package main
 
 import (
+	"net"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/pkg/errors"
@@ -77,7 +77,7 @@ func (c *apiClient) Handle(btn button) error {
 		} else {
 			// if current status is on or unknown
 			if err := c.put("/tv/off"); err != nil {
-				if os.IsTimeout(err) {
+				if err, ok := err.(net.Error); ok && err.Timeout() {
 					// if timeout, assume TV is already off
 					c.tv.Status = tvStatusOff
 					return nil

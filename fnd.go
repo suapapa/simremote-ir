@@ -2,26 +2,73 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"net"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/suapapa/go_devices/tm1638"
+	"periph.io/x/conn/v3/gpio/gpioreg"
 )
 
-func displayWelcome(dev *tm1638.Module) error {
+const (
+	blank = "        "
+)
+
+type FND struct {
+	m          *tm1638.Module
+	lastString string
+
+	sync.Mutex
+}
+
+func NewFND() *FND {
+	m, err := tm1638.Open(
+		gpioreg.ByName("17"), // data
+		gpioreg.ByName("27"), // clk
+		gpioreg.ByName("22"), // stb
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &FND{
+		m: m,
+	}
+}
+
+func (f *FND) SetString(s string) {
+	f.Lock()
+	defer f.Unlock()
+	if len(s) > 8 {
+		s = s[:8]
+	} else if len(s) < 8 {
+		s += blank[:8-len(s)]
+	}
+
+	if f.lastString == s {
+		return
+	}
+
+	f.m.SetString(s)
+	f.lastString = s
+}
+
+func (f *FND) Welcome() error {
+	f.Lock()
+	defer f.Unlock()
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 loop:
 	for i := 0; i < 100; i++ {
-		dev.SetString(randString(rnd))
+		f.m.SetString(randString(rnd))
 		time.Sleep(30 * time.Millisecond)
 	}
 	_, ip, _, err := resolveNet()
 	if err != nil || ip == "" {
 		goto loop
 	}
-	dev.SetString("srmt-" + ip[len(ip)-3:])
+	f.m.SetString("srmt-" + ip[len(ip)-3:])
 	return nil
 }
 
