@@ -16,6 +16,9 @@ type apiClient struct {
 }
 
 func NewAPIClient(baseAddr string) *apiClient {
+	if baseAddr == "" {
+		baseAddr = "http://" + net.JoinHostPort("localhost", "5000")
+	}
 	return &apiClient{
 		baseAddr: baseAddr,
 		tv:       NewTV(),
