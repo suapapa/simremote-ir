@@ -3,7 +3,9 @@ package main
 type button uint8
 
 const (
-	PWR button = iota
+	UNKNOWN button = iota
+	PWRON
+	PWROFF
 	MODE
 	AOUT
 	UP
@@ -23,8 +25,12 @@ const (
 
 func (b button) String() string {
 	switch b {
-	case PWR:
-		return "PWR"
+	case UNKNOWN:
+		return "UNKNOWN"
+	case PWRON:
+		return "PWRON"
+	case PWROFF:
+		return "PWROFF"
 	case MODE:
 		return "MODE"
 	case AOUT:

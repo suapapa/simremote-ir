@@ -74,24 +74,21 @@ func (c *apiClient) Handle(btn button) error {
 	switch btn {
 	case UP, DOWN, LEFT, RIGHT, OK, BACK, HOME, CHUP, CHDOWN, VOLDOWN, VOLUP, INFO:
 		return c.keyHandler(btn)
-	case PWR:
-		if c.tv.Status == tvStatusOff {
-			if err := c.put("/tv/on"); err != nil {
-				return errors.Wrap(err, "failed to turn on TV")
-			}
-			c.tv.Status = tvStatusOn
-		} else {
-			// if current status is on or unknown
-			if err := c.put("/tv/off"); err != nil {
-				if err, ok := err.(net.Error); ok && err.Timeout() {
-					// if timeout, assume TV is already off
-					c.tv.Status = tvStatusOff
-					return nil
-				}
-				return errors.Wrap(err, "failed to turn off TV")
-			}
-			c.tv.Status = tvStatusOff
+	case PWRON:
+		if err := c.put("/tv/on"); err != nil {
+			return errors.Wrap(err, "failed to turn on TV")
 		}
+	case PWROFF:
+		// if current status is on or unknown
+		if err := c.put("/tv/off"); err != nil {
+			if err, ok := err.(net.Error); ok && err.Timeout() {
+				// if timeout, assume TV is already off
+				c.tv.Status = tvStatusOff
+				return nil
+			}
+			return errors.Wrap(err, "failed to turn off TV")
+		}
+
 	case AOUT:
 		if err := c.put("/audio/" + c.tv.AudioOuts[c.tv.CurAppIdx]); err != nil {
 			return errors.Wrap(err, "failed to change audio output")
