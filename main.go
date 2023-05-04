@@ -16,12 +16,14 @@ var (
 	port            string
 	enableLongPress bool
 	apiAddr         string
+	dryRun          bool
 )
 
 func main() {
 	flag.StringVar(&port, "port", "/dev/ttyUSB0", "serial port")
 	flag.BoolVar(&enableLongPress, "l", false, "enable long press")
 	flag.StringVar(&apiAddr, "api", "http://localhost:5000", "api address")
+	flag.BoolVar(&dryRun, "n", false, "dry run")
 	flag.Parse()
 
 	_, err := host.Init()

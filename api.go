@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net"
 	"net/http"
 	"time"
@@ -25,6 +26,11 @@ func NewAPIClient(baseAddr string) *apiClient {
 }
 
 func (c *apiClient) put(path string) error {
+	if dryRun {
+		log.Printf("dry run: PUT %s", path)
+		return nil
+	}
+
 	req, err := http.NewRequest(http.MethodPut, c.baseAddr+path, nil)
 	if err != nil {
 		return errors.Wrap(err, "failed to create request")
